@@ -1,4 +1,38 @@
-## Multiple Turtlebot3 robot support in Gazebo
+## Multiple Turtlebot3 robot
+### For RS2 students
+Please note that at the moment, this package is only tested with simulated turtlebot3 on Gazebo. It may or may not work with the actual turtlebot3 hardware setup. We will update this package once that is confirmed.
+#### Installation
+In the workspace, clone the `turtlebot3_simulation` package and build **WITH SIMLINK-INSTALL**
+```
+mkdir -p multi_tb_ws/src
+cd multi_tb_ws/src
+git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+cd ../
+colcon build --symlink-install
+```
+
+In the same workspace, clone this package and build
+```
+cd multi_tb_ws/src
+git clone https://github.com/dkhoanguyen/turtlebot3_multi_robot.git
+cd ../
+colcon build --symlink-install
+```
+Remember to source the workspace whenever you want to run
+```
+source multi_tb_ws/install/setup.bash
+```
+#### Run
+Unlike the original package, the new launch file `multi_robot_gazebo_bringup.launch.py` and `multi_robot_nav2_bringup.launch.py` are designed to work independently to support running with real hardware. `multi_robot_gazebo_bringup.launch.py` will simply start a gazebo turtlebot3 world with 2 turtlebots.
+```
+ros2 launch turtlebot3_multi_robot multi_robot_gazebo_bringup.launch.py 
+```
+In another terminal, run `multi_robot_nav2_bringup.launch.py` to start 2 nav2 instances for each turtlebot3 in the gazebo world
+```
+ros2 launch turtlebot3_multi_robot multi_robot_nav2_bringup.launch.py 
+```
+
+#### Original instruction (for reference)
 The ROS2 project  scalable solution for launching multiple TurtleBot3 robots with navigation capabilities using the Navigation2 (Nav2) stack. By leveraging namespaces in ROS2, this project enables the seamless deployment of multiple TurtleBot3 robots in a simple and organized manner. Each robot instance can be differentiated by its unique namespace, ensuring independence and preventing naming conflicts.
 
 
