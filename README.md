@@ -32,6 +32,68 @@ In another terminal, run `multi_robot_nav2_bringup.launch.py` to start 2 nav2 in
 ros2 launch turtlebot3_multi_robot multi_robot_nav2_bringup.launch.py 
 ```
 
+### Running turtlebot3 hardware with namespace for all topics
+Before running the following command please make sure you have 2 terminals, one for sshing into the Turtlebot and another for copying the launch file `namespaced_robot.launch.py` from the launch folder of this repo to the Turtlebot. Please make sure the current path of the 2nd terminal is inside this repo.
+
+
+SSH into the TurtleBot
+```
+ssh ubuntu@<ip-address>
+```
+
+Create a new workspace and navigate into it
+```
+mkdir -p ~/rs2_ws/src
+cd ~/rs2_ws/src
+```
+
+Create a new package using ament_cmake
+```
+ros2 pkg create multi_robot_bringup --build-type ament_cmake
+```
+
+Create a launch directory inside the package
+```
+cd multi_robot_bringup
+mkdir launch
+```
+
+Replace the contents of CMakeLists.txt with the following:
+```
+echo "cmake_minimum_required(VERSION 3.5)
+project(multi_robot_bringup)
+
+find_package(ament_cmake REQUIRED)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/\${PROJECT_NAME}
+)
+
+ament_package()" > CMakeLists.txt
+```
+
+Copy the launch file from your host to the TurtleBot (Run this on your host computer, not the TurtleBot)
+```
+scp launch/namespaced_robot.launch.py ubuntu@<ip-address>:~/rs2_ws/src/
+multi_robot_bringup/launch/
+```
+
+Build the workspace
+```
+cd ~/rs2_ws
+colcon build --symlink-install
+```
+Source the environment
+```
+source install/setup.bash
+```
+
+Launch the file with a namespace argument
+```
+ros2 launch multi_robot_bringup namespaced_robot.launch.py namespace:=<robot_name>
+```
+
 #### Original instruction (for reference)
 The ROS2 project  scalable solution for launching multiple TurtleBot3 robots with navigation capabilities using the Navigation2 (Nav2) stack. By leveraging namespaces in ROS2, this project enables the seamless deployment of multiple TurtleBot3 robots in a simple and organized manner. Each robot instance can be differentiated by its unique namespace, ensuring independence and preventing naming conflicts.
 
