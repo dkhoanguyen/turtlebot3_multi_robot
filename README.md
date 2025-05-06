@@ -1,6 +1,5 @@
 ## Multiple Turtlebot3 robot
 ### For RS2 students
-Please note that at the moment, this package is only tested with simulated turtlebot3 on Gazebo. It may or may not work with the actual turtlebot3 hardware setup. We will update this package once that is confirmed.
 #### Installation
 In the workspace, clone the `turtlebot3_simulation` package and build **WITH SIMLINK-INSTALL**
 ```
