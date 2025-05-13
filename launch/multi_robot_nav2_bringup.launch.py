@@ -50,6 +50,7 @@ def generate_launch_description():
         settings = yaml.safe_load(file)
     robots = settings["robots"]
     
+    
     # Number values must be converted to string as launch config requires these values to be string
     for robot in robots:
         robot['x_pose'] = str(robot['x_pose'])
@@ -82,7 +83,7 @@ def generate_launch_description():
         executable='map_server',
         name='map_server',
         output='screen',
-        parameters=[{'yaml_filename': os.path.join(get_package_share_directory('turtlebot3_navigation2'), 'map', 'map.yaml'),
+        parameters=[{'yaml_filename': os.path.join(get_package_share_directory('turtlebot3_multi_robot'), 'map', 'map.yaml'),
                      },],
         remappings=remappings)
 
@@ -103,6 +104,7 @@ def generate_launch_description():
     # Spawn turtlebot3 instances in gazebo
     for robot in robots:
         namespace = [ '/' + robot['name'] ]
+        # namespace = ['/']
         bringup_cmd = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(nav_launch_dir, 'bringup_launch.py')),
@@ -110,7 +112,7 @@ def generate_launch_description():
                                     'slam': 'False',
                                     'namespace': namespace,
                                     'use_namespace': 'True',
-                                    'map': '',
+                                    'map':  os.path.join(get_package_share_directory('turtlebot3_multi_robot'), 'map', 'map.yaml'),
                                     'map_server': 'False',
                                     'params_file': params_file,
                                     'default_bt_xml_filename': os.path.join(
@@ -119,6 +121,18 @@ def generate_launch_description():
                                     'autostart': 'true',
                                     'use_sim_time': use_sim_time, 'log_level': 'warn'}.items()
                                     )
+        # bringup_cmd = IncludeLaunchDescription(
+        #         PythonLaunchDescriptionSource(
+        #             os.path.join(nav_launch_dir, 'localization_launch.py')),
+        #             launch_arguments={  
+        #                             # 'namespace': namespace,
+        #                             # 'use_namespace': 'True',
+        #                             'map':  os.path.join(get_package_share_directory('turtlebot3_multi_robot'), 'map', 'map.yaml'),
+        #                             'map_server': 'False',
+        #                             'params_file': params_file,
+        #                             'autostart': 'true',
+        #                             'use_sim_time': use_sim_time, 'log_level': 'warn'}.items()
+        #                             )
         ld.add_action(bringup_cmd)
     ######################
 
@@ -127,17 +141,6 @@ def generate_launch_description():
     for robot in robots:
 
         namespace = [ '/' + robot['name'] ]
-
-        # Create a initial pose topic publish call
-        message = '{header: {frame_id: map}, pose: {pose: {position: {x: ' + \
-            robot['x_pose'] + ', y: ' + robot['y_pose'] + \
-            ', z: 0.1}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0000000}}, }}'
-
-        initial_pose_cmd = ExecuteProcess(
-            cmd=['ros2', 'topic', 'pub', '-t', '3', '--qos-reliability', 'reliable', namespace + ['/initialpose'],
-                'geometry_msgs/PoseWithCovarianceStamped', message],
-            output='screen'
-        )
 
         rviz_cmd = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -148,8 +151,6 @@ def generate_launch_description():
                                   'rviz_config': rviz_config_file, 'log_level': 'warn'}.items(),
                                    condition=IfCondition(enable_rviz)
                                     )
-
-        ld.add_action(initial_pose_cmd)
         ld.add_action(rviz_cmd)
 
     ######################

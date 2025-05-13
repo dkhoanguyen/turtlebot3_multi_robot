@@ -36,7 +36,7 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     usb_port = LaunchConfiguration('usb_port', default='/dev/ttyACM0')
     lidar_port = LaunchConfiguration('port', default='/dev/ttyUSB0')
-    frame_id = LaunchConfiguration('frame_id', default='laser')
+    frame_id = LaunchConfiguration('frame_id', default='base_scan')
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     tb3_param_dir = LaunchConfiguration(
         'tb3_param_dir',
